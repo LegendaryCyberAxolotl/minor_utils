@@ -8,3 +8,4 @@ version = "0.1.0"
 description = "Utils compilation for easier work"
 authors = [{name = "CyberAxolotl", email = "minor.gleb@outlook.com"}]
 license = "MIT"
+requires-python = ">=3.10"
