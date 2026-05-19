@@ -3,3 +3,12 @@ class InvalidArgumentError(ValueError):
 
 class MissingStringError(ValueError):
     pass
+
+class FormatAlreadyExistsError(Exception):
+    pass
+
+class AliasAlreadyExistsError(FormatAlreadyExistsError):
+    pass
+
+class DefaultFormatModificationError(Exception):
+    pass
