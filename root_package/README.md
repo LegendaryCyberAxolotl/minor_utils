@@ -6,6 +6,7 @@ Utility library for formatting and helper functions.
 
 ```bash
 pip install minor-utils
+```
 
 ## Note
 
