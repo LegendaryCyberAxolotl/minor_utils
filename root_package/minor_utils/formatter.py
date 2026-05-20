@@ -71,8 +71,8 @@ class Formatter:
 
     formats = {
         "capitalize": cap,
-        "up": up,
-        "down": down,
+        "upper": up,
+        "lower": down,
         "spike": spike,
         "clean": clean,
         "camelCase": camel_case,

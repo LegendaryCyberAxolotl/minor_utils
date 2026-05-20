@@ -38,7 +38,7 @@ class Manager:
             if self.is_existing_func(func_name):
                 raise InvalidArgumentError(f"Function '{func_name}' already exists in manager {self.__name}.")
             
-            self.__funcs.append(func_name, f)
+            self.__funcs.append((func_name, f))
 
             return f
         
@@ -278,7 +278,7 @@ class Manager:
             results.setdefault(func_id, []).append(result)
 #--------
 
-# --------(Validation API)--------
+#--------(Validation API)--------
     def is_existing_func(self, name):
         try:
             func_id = int(name)
