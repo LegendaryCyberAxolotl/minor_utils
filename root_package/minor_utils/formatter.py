@@ -5,7 +5,6 @@ from .errors import DefaultFormatModificationError, MissingStringError, InvalidA
 
 class Formatter:
 #--------(Format functions)--------
-
     @staticmethod
     def cap(s):
         """Capitalize the first character of the string and make the rest lowercase."""
@@ -89,7 +88,6 @@ class Formatter:
     enabled_formats = list(formats.keys()) + list(format_aliases.keys())
 
 #--------(Formatter function)--------
-
     @classmethod
     def get_callable(cls, string_format):
         if string_format in cls.format_aliases:
@@ -109,7 +107,9 @@ class Formatter:
             )
         
         return func
+#--------
 
+#--------
     @classmethod
     def formatting(cls,
         string: str,
@@ -144,6 +144,7 @@ class Formatter:
             output = output[::-1]
 
         return output
+#--------
     
 #--------(Pipeline API)--------
     @classmethod
@@ -159,12 +160,13 @@ class Formatter:
         for fmt in formats:
             string = cls.formatting(string, fmt, inverse=inversed, reverse=reversed)
         return string
+#--------
 
 #--------(Registry API)--------
     @classmethod
     def add_format(cls, func=None, name=None, *aliases):
         def decorator(f):
-            cls.validate_format_function(f)
+            cls.__validate_format_function(f)
 
             format_name = (
                 name
@@ -205,10 +207,12 @@ class Formatter:
             return decorator
         
         return decorator(func)
+#--------
     
+#--------
     @classmethod
     def replace_format(cls, name, func):
-        cls.validate_format_function(func)
+        cls.__validate_format_function(func)
 
         if not cls.is_existing_format(name):
             raise InvalidArgumentError(
@@ -221,7 +225,9 @@ class Formatter:
             )
 
         cls.formats[name] = func
+#--------
 
+#--------
     @classmethod
     def remove_format(cls, name):
         if not cls.is_existing_format(name):
@@ -236,13 +242,17 @@ class Formatter:
 
         cls.formats.pop(name, None)
         cls.custom_formats.pop(name, None)
+#--------
 
+#--------
     @classmethod
     def reset_formats(cls):
         cls.clear_aliases()
         cls.clear_custom_formats()
         cls.formats = cls.default_formats.copy()
+#--------
 
+#--------
     @classmethod
     def restore_format(cls, name):
         if name not in cls.default_formats:
@@ -259,14 +269,18 @@ class Formatter:
         cls.custom_formats.pop(name, None)
         if name not in cls.enabled_formats:
             cls.enabled_formats.append(name)
+#--------
 
+#--------
     @classmethod
     def clear_formats(cls):
         cls.formats.clear()
         cls.custom_formats.clear()
         cls.enabled_formats.clear()
         cls.format_aliases.clear()
+#--------
 
+#--------
     @classmethod
     def clear_default_formats(cls):
         for name in list(cls.default_formats):
@@ -276,7 +290,9 @@ class Formatter:
                 cls.enabled_formats.remove(name)
 
             cls.formats.pop(name, None)
+#--------
 
+#--------
     @classmethod
     def clear_custom_formats(cls):
         for name in list(cls.custom_formats):
@@ -288,11 +304,15 @@ class Formatter:
             cls.formats.pop(name, None)
 
         cls.custom_formats.clear()
+#--------
 
+#--------
     @classmethod
     def get_formats(cls):
         return cls.formats
+#--------
     
+#--------
     @classmethod
     def get_default_formats(cls):
         return {
@@ -300,15 +320,21 @@ class Formatter:
             for name in cls.formats
             if name in cls.default_formats
         }
+#--------
     
+#--------
     @classmethod
     def get_custom_formats(cls):
         return cls.custom_formats
+#--------
 
+#--------
     @classmethod
     def get_builtin_formats(cls):
         return cls.default_formats
+#--------
 
+#--------
     @classmethod
     def get_format_function(cls, name):
         if not cls.is_existing_format(name):
@@ -317,7 +343,9 @@ class Formatter:
             )
 
         return cls.formats[name]
+#--------
 
+#--------
     @classmethod
     def names_of(cls, func):
         names = []
@@ -329,7 +357,9 @@ class Formatter:
         raise InvalidArgumentError(
             f"Format {func.__name__} not found."
         )
+#--------
 
+#--------
     @classmethod
     def get_format_info(cls, name):
         if not cls.is_existing_format(name):
@@ -344,11 +374,15 @@ class Formatter:
             "function": func,
             "doc": func.__doc__
         }
+#--------
 
+#--------
     @classmethod
     def get_format_doc(cls, name):
         return cls.get_format_function(name).__doc__
+#--------
 
+#--------
     @classmethod
     def rename_format(cls, old_name, new_name):
         if not cls.is_existing_format(old_name):
@@ -386,15 +420,21 @@ class Formatter:
 
         for alias in aliases:
             cls.format_aliases[alias] = func
+#--------
 
+#--------
     @classmethod
     def has_format(cls, name):
         return cls.is_existing_format(name)
-    
+#--------
+
+#--------
     @classmethod
     def has_alias(cls, name):
         return cls.is_existing_alias(name)
+#--------
 
+#--------
     @classmethod
     def disable(cls, name):
         if not cls.is_existing_format(name):
@@ -410,21 +450,25 @@ class Formatter:
 
         if name in cls.enabled_formats:
             cls.enabled_formats.remove(name)
+#--------
 
+#--------
     @classmethod
     def enable(cls, name):
         if not cls.is_existing_format(name):
             raise InvalidArgumentError(
                 f"Unable to enable format: format '{name}' does not exist."
             )
-        
+
         aliases = list(cls.aliases_of(name))
         if not cls.is_enabled(name):
             cls.enabled_formats.append(name)
         for alias in aliases:
             if not cls.is_enabled(alias):
                 cls.enabled_formats.append(alias)
+#--------
 
+#--------
     @classmethod
     def toggle(cls, name):
         if not cls.is_existing_format(name):
@@ -445,12 +489,13 @@ class Formatter:
             for alias in aliases:
                 if alias not in cls.enabled_formats:
                     cls.enabled_formats.append(alias)
+#--------
 
+#--------
     @classmethod
     def is_enabled(cls, name):
         return name in cls.enabled_formats
-        
-    
+#--------
 
 #--------(Validation API)--------
     @classmethod
@@ -461,21 +506,28 @@ class Formatter:
                 "Input string is empty or contains only whitespace."
             )
         return s
+#--------
 
+#--------
     @classmethod
     def is_existing_format(cls, name):
         return name in cls.formats
-    
+#--------
+ 
+#--------    
     @classmethod
     def is_existing_alias(cls, name):
         return name in cls.format_aliases
+#--------
 
+#--------
     @classmethod
-    def validate_format_function(cls, func):
+    def __validate_format_function(cls, func):
         sig = signature(func)
 
         if len(sig.parameters) != 1:
             raise InvalidArgumentError("Format function must accept exactly one argument.")
+#--------
 
 #--------(Alias API)--------
 
@@ -501,7 +553,9 @@ class Formatter:
 
         if alias_name not in cls.enabled_formats:
             cls.enabled_formats.append(alias_name)
+#--------
 
+#--------
     @classmethod
     def del_alias(cls, alias_name):
         if not cls.is_existing_alias(alias_name):
@@ -513,7 +567,9 @@ class Formatter:
             cls.enabled_formats.remove(alias_name)
 
         del cls.format_aliases[alias_name]
+#--------
 
+#--------
     @classmethod
     def del_aliases_of(cls, existing_name):
         if not cls.is_existing_format(existing_name):
@@ -532,14 +588,18 @@ class Formatter:
                 cls.enabled_formats.remove(alias)
 
             del cls.format_aliases[alias]
+#--------
 
+#--------
     @classmethod
     def clear_aliases(cls):
         for alias in list(cls.format_aliases):
             if alias in cls.enabled_formats:
                 cls.enabled_formats.remove(alias)
             del cls.format_aliases[alias]
+#--------
 
+#--------
     @classmethod
     def aliases_of(cls, existing_name):
         if not cls.is_existing_format(existing_name):
@@ -552,7 +612,10 @@ class Formatter:
             for name, func in cls.format_aliases.items()
             if func is cls.formats[existing_name] and name != existing_name
         }
+#--------
 
+#--------
     @classmethod
     def get_all_aliases(cls):
         return cls.format_aliases
+#--------

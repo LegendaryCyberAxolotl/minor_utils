@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "minor_utils"
-version = "0.1.1"
+version = "0.2.0dev1"
 description = "Utils compilation for easier work"
 authors = [{name = "CyberAxolotl", email = "minor.gleb@outlook.com"}]
 license = "MIT"
