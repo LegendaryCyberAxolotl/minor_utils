@@ -1,5 +1,7 @@
+from importlib.metadata import version
+
 __title__ = "minor_utils"
-__version__ = "0.1.0"
+__version__ = version("minor_utils")
 __author__ = "Gleb Minor"
 __license__ = "MIT"
 
