@@ -14,3 +14,4 @@ build/
 *.log
 
 test.py
+guide.md
