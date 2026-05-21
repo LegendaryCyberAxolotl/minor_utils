@@ -87,7 +87,7 @@ class Formatter:
     format_aliases = {}
     enabled_formats = list(formats.keys()) + list(format_aliases.keys())
 
-#--------(Formatter function)--------
+#--------(Formating API)--------
     @classmethod
     def get_callable(cls, string_format):
         if string_format in cls.format_aliases:
@@ -308,6 +308,52 @@ class Formatter:
 
 #--------
     @classmethod
+    def rename_format(cls, old_name, new_name):
+        if not cls.is_existing_format(old_name):
+            raise InvalidArgumentError(
+                f"Unable to rename format: format '{old_name}' does not exist."
+            )
+
+        if cls.is_existing_format(new_name):
+            raise FormatAlreadyExistsError(
+                f"Unable to rename format: format '{new_name}' already exists."
+            )
+
+        if cls.is_existing_alias(new_name):
+            raise FormatAlreadyExistsError(
+                f"Unable to rename format: alias '{new_name}' already exists."
+            )
+        
+        if new_name in cls.default_formats:
+            raise DefaultFormatModificationError(
+                f"Unable to replace format: '{new_name}' is a default format."
+            )
+
+        aliases = list(cls.aliases_of(old_name))
+
+        func = cls.formats.pop(old_name)
+
+        cls.formats[new_name] = func
+
+        if old_name in cls.custom_formats:
+            cls.custom_formats[new_name] = cls.custom_formats.pop(old_name)
+
+        if old_name in cls.enabled_formats:
+            cls.enabled_formats.remove(old_name)
+            cls.enabled_formats.append(new_name)
+
+        for alias in aliases:
+            cls.format_aliases[alias] = func
+#--------
+
+#--------
+    @classmethod
+    def has_format(cls, name):
+        return cls.is_existing_format(name)
+#--------
+
+#--------(Getters API)--------
+    @classmethod
     def get_formats(cls):
         return cls.formats
 #--------
@@ -382,59 +428,7 @@ class Formatter:
         return cls.get_format_function(name).__doc__
 #--------
 
-#--------
-    @classmethod
-    def rename_format(cls, old_name, new_name):
-        if not cls.is_existing_format(old_name):
-            raise InvalidArgumentError(
-                f"Unable to rename format: format '{old_name}' does not exist."
-            )
-
-        if cls.is_existing_format(new_name):
-            raise FormatAlreadyExistsError(
-                f"Unable to rename format: format '{new_name}' already exists."
-            )
-
-        if cls.is_existing_alias(new_name):
-            raise FormatAlreadyExistsError(
-                f"Unable to rename format: alias '{new_name}' already exists."
-            )
-        
-        if new_name in cls.default_formats:
-            raise DefaultFormatModificationError(
-                f"Unable to replace format: '{new_name}' is a default format."
-            )
-
-        aliases = list(cls.aliases_of(old_name))
-
-        func = cls.formats.pop(old_name)
-
-        cls.formats[new_name] = func
-
-        if old_name in cls.custom_formats:
-            cls.custom_formats[new_name] = cls.custom_formats.pop(old_name)
-
-        if old_name in cls.enabled_formats:
-            cls.enabled_formats.remove(old_name)
-            cls.enabled_formats.append(new_name)
-
-        for alias in aliases:
-            cls.format_aliases[alias] = func
-#--------
-
-#--------
-    @classmethod
-    def has_format(cls, name):
-        return cls.is_existing_format(name)
-#--------
-
-#--------
-    @classmethod
-    def has_alias(cls, name):
-        return cls.is_existing_alias(name)
-#--------
-
-#--------
+#--------(Toggle API)--------
     @classmethod
     def disable(cls, name):
         if not cls.is_existing_format(name):
@@ -618,4 +612,10 @@ class Formatter:
     @classmethod
     def get_all_aliases(cls):
         return cls.format_aliases
+#--------
+
+#--------
+    @classmethod
+    def has_alias(cls, name):
+        return cls.is_existing_alias(name)
 #--------
